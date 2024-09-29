@@ -38,8 +38,10 @@ export default function Forecast() {
                 console.error('No TLDR result found in the response');
               }
 
-              if (data.imageUrls) {
+              if (data.imageUrls && data.imageUrls.length > 0) {
                 setImageUrls(data.imageUrls); // Set generated image URLs
+              } else {
+                setImageUrls(["Unable to generate images"]); // Fallback message if no images generated
               }
 
               setIsLoading(false); // Set loading to false after everything is fetched
@@ -124,7 +126,9 @@ export default function Forecast() {
 
             {/* Right Side: Generated AI Visuals from DALL·E */}
             <div className="h-full w-full flex items-center justify-center bg-black">
-              {imageUrls.length > 0 && (
+              {imageUrls[currentIndex] === "Unable to generate images" || !imageUrls[currentIndex] ? (
+                <p className="text-white text-2xl">Unable to generate images.</p>
+              ) : (
                 <img
                   src={imageUrls[currentIndex]}
                   alt={`AI Visual ${currentIndex + 1}`}
@@ -132,6 +136,7 @@ export default function Forecast() {
                 />
               )}
             </div>
+
           </>
         )}
       </section>

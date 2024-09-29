@@ -43,7 +43,8 @@ export async function GET(req: NextRequest) {
 
     // Only proceed with TLDR request
     if (queryType === 'tldr') {
-      const systemPrompt = "You are a fashion trend expert focusing on fashion trends. Summarize the top fashion trends from the given search results in a 5 sentence paragraph. Do not use bullet points or number like (1, 2, 3...) to split the sentences.";
+      const systemPrompt = "You are a fashion trend expert focusing on fashion trends. Summarize the top fashion trends from the given search results in a " +
+      "5 sentence paragraph where each sentence contains max 20 words. Do not use bullet points or number like (1, 2, 3...) to split the sentences.";
       const userMessage = "Please provide a brief summary of the top fashion trends.";
 
       // Pass the Exa results as a message to OpenAI
@@ -73,30 +74,29 @@ export async function GET(req: NextRequest) {
           const result = filteredResponse.choices[0].message.content;
           console.log('Filtered Results:', result);
 
-          // Now we can use the filtered result to generate images with DALL·E
+          // Generate images with DALL·E
+          let imageUrls: string[] = [];
           try {
             let dallePrompt = `Showcase complete outfits. No faces. ${result}`;
             if (dallePrompt.length > 1000) {
-              dallePrompt = dallePrompt.slice(0, 980) + "..."; // Trim to fit within 1000 characters
+              dallePrompt = dallePrompt.slice(0, 980) + "...";
             }
-
+  
             const dalleResponse = await openai.images.generate({
               prompt: dallePrompt,
-              n: 5, 
+              n: summary.split(/[.!?]\s/).filter(Boolean).length, 
               size: '512x512',
             });
-
-            const imageUrls = dalleResponse.data.map((img: any) => img.url);
-            return NextResponse.json({ summary, imageUrls }, { status: 200 });
+  
+            imageUrls = dalleResponse.data.map((img: any) => img.url);
           } catch (dalleError: unknown) {
             console.error('DALL·E Image Generation Error:', dalleError);
-            if (dalleError instanceof Error) {
-              return NextResponse.json({ error: 'Failed to generate images.', details: dalleError.message }, { status: 500 });
-            } else {
-              return NextResponse.json({ error: 'Failed to generate images.', details: 'Unknown error occurred' }, { status: 500 });
-            }
+            imageUrls = ["Unable to generate images"];  // If image generation fails, show this message
           }
-
+  
+          // Always return the summary, and if no images are available, return "Unable to generate images"
+          return NextResponse.json({ summary, imageUrls: imageUrls.length > 0 ? imageUrls : ["Unable to generate images"] }, { status: 200 });
+  
         } else {
           return NextResponse.json({ error: 'Failed to filter sentences.' }, { status: 500 });
         }
