@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react";
 export default function TrendComparison({ city }: { city: string }) {
   const [hasFetched, setHasFetched] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [comparison, setComparison] = useState<string>(""); // Single string for trends comparison
+  const [buy, setBuy] = useState<string>(""); // Single string for trends comparison
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
@@ -32,13 +32,10 @@ export default function TrendComparison({ city }: { city: string }) {
           const fetchDataAsync = async () => {
             setIsLoading(true);
 
-            const query = `This is the biggest difference in fashion in ${city} today versus 5 years ago:`;
-            const data = await fetchData(`/api/perform-rag?type=compare&query=${encodeURIComponent(query)}&city=${encodeURIComponent(city)}`);
+            const query = `This is the most sustaniable fashion company to buy clothing that is trending in ${city}:`;
+            const data = await fetchData(`/api/perform-rag?type=buy&query=${encodeURIComponent(query)}&city=${encodeURIComponent(city)}`);
 
-            // console.log("Comparison data: ", data);
-
-            // Set comparison result
-            setComparison(data.summary || "Unable to generate comparison.");
+            setBuy(data.summary || "Unable to generate where to buy information.");
 
             setIsLoading(false);
             setHasFetched(true);
@@ -68,12 +65,20 @@ export default function TrendComparison({ city }: { city: string }) {
           <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-white"></div>
         </div>
       ) : (
-        <div className="h-full flex flex-col items-center justify-center p-10 relative">
-          <h2 className="text-3xl text-center text-white mb-4">Today's Looks vs. Yesterday's Iconic Trends</h2>
-          <div className="text-xl text-center text-white">
-            <p>{comparison}</p>
+        <>
+          {/* Left Section - "Title" */}
+          <div className="h-full flex flex-col items-center justify-center p-10 relative w-1/2">
+            <h2 className="text-3xl text-center text-white mb-4">Where To Shop</h2>
           </div>
-        </div>
+
+          {/* Right Section - "Yesterday's Iconic Trends" */}
+          <div className="h-full w-full flex items-center justify-center p-10 bg-black relative w-1/2">
+            <h2 className="text-3xl text-center text-white mb-4">Today's Looks vs. Yesterday's Iconic Trends</h2>
+            <div className="text-xl text-center text-white">
+              <p>{buy}</p>
+            </div>
+          </div>
+        </>
       )}
     </section>
   );
