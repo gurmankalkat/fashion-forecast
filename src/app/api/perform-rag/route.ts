@@ -42,10 +42,17 @@ export async function GET(req: NextRequest) {
     console.log('Exa Results:', JSON.stringify(exaResult, null, 2));
 
     // Only proceed with TLDR request
-    if (queryType === 'tldr') {
-      const systemPrompt = "You are a fashion trend expert focusing on fashion trends. Summarize the top fashion trends from the given search results in a " +
-      "5 sentence paragraph where each sentence contains max 20 words. Do not use bullet points or number like (1, 2, 3...) to split the sentences.";
-      const userMessage = "Please provide a brief summary of the top fashion trends.";
+    if (queryType === 'tldr' || queryType === 'compare') {
+      let systemPrompt = "";
+      let userMessage = "";
+
+      if (queryType === 'tldr') {
+        systemPrompt = "You are a fashion trend expert focusing on fashion trends. Summarize the top fashion trends from the given search results in a 4-sentence paragraph where each sentence contains max 20 words. Do not use bullet points or numbers like (1, 2, 3...) to split the sentences.";
+        userMessage = "Please provide a brief summary of the top fashion trends.";
+      } else if (queryType === 'compare') {
+        systemPrompt = `You are a data scientist. Compare current fashion trends with historical fashion trends. Provide a concise paragraph explaining the differences and similarities.`;
+        userMessage = "Please provide a comparison between current and historical fashion trends.";
+      }
 
       // Pass the Exa results as a message to OpenAI
       const response = await openai.chat.completions.create({
@@ -60,7 +67,7 @@ export async function GET(req: NextRequest) {
         let summary = response.choices[0].message.content;
 
         // Ask GPT to remove any sentences that would be inappropriate for image generation
-        const filterPrompt = "Please remove any word, names, and sentences from the following text that would not be appropriate or possible to generate an image of (such as explicit content, abstract ideas, celebrity names or anything inappropriate for a fashion image):";
+        const filterPrompt = "Please remove any word, names, and sentences from the following text that would not be appropriate or make it impossible to generate an image. For instance, remove explicit content, celebrity names, or anything inappropriate for a fashion image.";
 
         const filteredResponse = await openai.chat.completions.create({
           model: 'gpt-3.5-turbo',
@@ -75,27 +82,50 @@ export async function GET(req: NextRequest) {
           console.log('Filtered Results:', result);
 
           // Generate images with DALL·E
-          let imageUrls: string[] = [];
-          try {
-            let dallePrompt = `Showcase complete outfits. No faces. ${result}`;
-            if (dallePrompt.length > 1000) {
-              dallePrompt = dallePrompt.slice(0, 980) + "...";
+          if (queryType === 'tldr') {
+            let imageUrls: string[] = [];
+            try {
+              let dallePrompt = `Showcase complete outfits. No faces. ${result}`;
+              if (dallePrompt.length > 1000) {
+                dallePrompt = dallePrompt.slice(0, 980) + "...";
+              }
+
+              const dalleResponse = await openai.images.generate({
+                prompt: dallePrompt,
+                n: summary.split(/[.!?]\s/).filter(Boolean).length, 
+                size: '512x512',
+              });
+
+              imageUrls = dalleResponse.data.map((img: any) => img.url);
+            } catch (dalleError: unknown) {
+              console.error('DALL·E Image Generation Error:', dalleError);
+              imageUrls = ["Unable to generate images"];  // If image generation fails, show this message
             }
-  
-            const dalleResponse = await openai.images.generate({
-              prompt: dallePrompt,
-              n: summary.split(/[.!?]\s/).filter(Boolean).length, 
-              size: '512x512',
-            });
-  
-            imageUrls = dalleResponse.data.map((img: any) => img.url);
-          } catch (dalleError: unknown) {
-            console.error('DALL·E Image Generation Error:', dalleError);
-            imageUrls = ["Unable to generate images"];  // If image generation fails, show this message
+
+            // Always return the summary, and if no images are available, return "Unable to generate images"
+            return NextResponse.json({ summary, imageUrls: imageUrls.length > 0 ? imageUrls : ["Unable to generate images"] }, { status: 200 });
+          } else {
+            let imageUrl: string = "";
+            try {
+              let dallePrompt = `Show a graph displaying comparison.  ${result}`;
+              if (dallePrompt.length > 1000) {
+                dallePrompt = dallePrompt.slice(0, 980) + "...";
+              }
+
+              const dalleResponse = await openai.images.generate({
+                prompt: dallePrompt,
+                n: 1, 
+                size: '512x512',
+              });
+
+              imageUrl = dalleResponse.data.map((img) => img.url)[0] || "Unable to generate images";
+            } catch (dalleError: unknown) {
+              console.error('DALL·E Image Generation Error:', dalleError);
+              imageUrl = "Unable to generate images";  // If image generation fails, show this message
+            }
+            return NextResponse.json({ summary, imageUrls: imageUrl.length > 0 ? imageUrl : ["Unable to generate image"] }, { status: 200 });
           }
-  
-          // Always return the summary, and if no images are available, return "Unable to generate images"
-          return NextResponse.json({ summary, imageUrls: imageUrls.length > 0 ? imageUrls : ["Unable to generate images"] }, { status: 200 });
+          
   
         } else {
           return NextResponse.json({ error: 'Failed to filter sentences.' }, { status: 500 });
@@ -103,7 +133,7 @@ export async function GET(req: NextRequest) {
       } else {
         return NextResponse.json({ error: 'Failed to generate TLDR.' }, { status: 500 });
       }
-    }
+    } 
 
     return NextResponse.json({ error: 'Invalid query type.' }, { status: 400 });
   } catch (error: any) {

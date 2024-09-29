@@ -33,7 +33,7 @@ export default function Home() {
         <h1 className="text-white text-7xl">Fashion Forecast</h1>
         <input
           type="text"
-          placeholder="Enter a city"
+          placeholder="Enter a fashion city (Paris, Milan, etc)"
           className="px-4 py-2 rounded-md text-center text-black placeholder-gray-500 w-80 font-roboto"
           value={city}
           onChange={handleInputChange}
