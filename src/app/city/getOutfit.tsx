@@ -166,15 +166,21 @@ export default function OutfitGenerator({ city }: { city: string }) {
               <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-black"></div>
             ) : (
               <>
-                {generatedOutfit && (
-                  <div className="text-xl mb-4 text-center font-roboto">
-                    <p>{generatedOutfit}</p>
-                  </div>
-                )}
-                {imageUrl && (
-                  <div className="flex flex-col items-center">
-                    <img src={imageUrl} alt="Generated Outfit" className="rounded-md shadow-md" />
-                  </div>
+                {generatedOutfit || imageUrl ? (
+                  <>
+                    {generatedOutfit && (
+                      <div className="text-xl mb-4 text-center font-roboto">
+                        <p>{generatedOutfit}</p>
+                      </div>
+                    )}
+                    {imageUrl && (
+                      <div className="flex flex-col items-center">
+                        <img src={imageUrl} alt="Generated Outfit" className="rounded-md shadow-md" />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-4xl text-center">Generated outfit will be here.</div>
                 )}
               </>
             )}

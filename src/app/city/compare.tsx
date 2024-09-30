@@ -60,15 +60,15 @@ export default function TrendComparison({ city }: { city: string }) {
   }, [city, hasFetched]);
 
   return (
-    <section ref={sectionRef} className="snap-start w-full h-screen bg-black flex items-center justify-center relative">
+    <section ref={sectionRef} className="snap-start w-full h-screen bg-customWhite flex items-center justify-center relative">
       {isLoading ? (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-white"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-black"></div>
         </div>
       ) : (
         <div className="h-full flex flex-col items-center justify-center p-10 relative">
-          <h2 className="text-3xl text-center text-white mb-4">Today's Looks vs. Yesterday's Iconic Trends</h2>
-          <div className="text-xl text-center text-white">
+          <h2 className="text-4xl text-center mb-4">Today's Looks vs. Yesterday's Iconic Trends</h2>
+          <div className="text-2xl text-center font-roboto p-24">
             <p>{comparison}</p>
           </div>
         </div>

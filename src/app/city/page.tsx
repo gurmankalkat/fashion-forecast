@@ -24,9 +24,9 @@ export default function Forecast() {
           Discover fashion inspiration from emerging trends, using insights from runway shows, seasonal changes, and consumer preferences.
         </motion.h1>
       </section>
-      {/* <TldrSection city={city || ''} />  */}
-      {/* <CompareSection city={city || ''} />  */}
+      <TldrSection city={city || ''} /> 
       <OutfitSection city={city || ''} /> 
+      <CompareSection city={city || ''} /> 
     </div>
   );
 }

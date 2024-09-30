@@ -18,7 +18,7 @@ export default function TldrSection({ city }: { city: string }) {
           const fetchData = async () => {
             if (city) {
               setIsLoading(true);
-              const query = `Here are what people are wearing in ${city}, influenced by celebrities, social media, fashion events, and runway shows:`;
+              const query = `Here are what people are wearing in ${city}, influenced by fashion news, celebrities, social media, fashion events, and runway shows:`;
               const response = await fetch(`/api/perform-rag?type=tldr&query=${encodeURIComponent(query)}&city=${encodeURIComponent(city)}`);
               const data = await response.json();
               console.log("data: ", data);
@@ -72,16 +72,16 @@ export default function TldrSection({ city }: { city: string }) {
   };
 
   return (
-    <section ref={tldrRef} className="snap-start w-full h-screen bg-black grid grid-cols-2 relative">
+    <section ref={tldrRef} className="snap-start w-full h-screen bg-customWhite grid grid-cols-2 relative">
       {isLoading ? (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-white"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-black"></div>
         </div>
       ) : (
         <>
           <div className="h-full flex flex-col items-center justify-center p-10 relative">
-            <h2 className="text-3xl text-center text-white mb-4">Current Trends & News</h2>
-            <div className="text-2xl text-center text-white">
+            <h2 className="text-4xl text-center mb-4">Current Trends & News</h2>
+            <div className="text-2xl text-center font-roboto">
               {tldrResults[currentIndex]}
             </div>
 
@@ -105,7 +105,7 @@ export default function TldrSection({ city }: { city: string }) {
 
           <div className="h-full w-full flex items-center justify-center bg-black">
             {imageUrls[currentIndex] === "Unable to generate images" || !imageUrls[currentIndex] ? (
-              <p className="text-white text-2xl">Unable to generate images.</p>
+              <p className="text-2xl">Unable to generate images.</p>
             ) : (
               <img
                 src={imageUrls[currentIndex]}

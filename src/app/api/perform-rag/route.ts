@@ -96,7 +96,8 @@ export async function GET(req: NextRequest) {
 
         if (filteredResponse.choices?.[0]?.message?.content) {
           const result = filteredResponse.choices[0].message.content;
-          const imageUrls = await generateImage(`You are a fashion stylist showcasing images of outfits. Only show clothing articles, fabrics, & accessories. No faces. ${result}`, summary.split(/[.!?]\s/).filter(Boolean).length, '512x512');
+          const imageUrls = await generateImage(`You are a fashion expert.
+            Your task is to provide detailed and visually appealing outfits based on ${result}. Avoid faces.`, summary.split(/[.!?]\s/).filter(Boolean).length, '512x512');
           return NextResponse.json({ summary, imageUrls }, { status: 200 });
         } else {
           return NextResponse.json({ error: 'Failed to filter sentences.' }, { status: 500 });
