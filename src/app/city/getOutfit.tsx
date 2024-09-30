@@ -2,8 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import Image from 'next/image';
+import { useSearchParams } from "next/navigation";
 
-export default function OutfitGenerator({ city }: { city: string }) {
+export default function OutfitGenerator() {
+  const searchParams = useSearchParams();
+  const city = searchParams.get("city");
+
   const [hasFetched, setHasFetched] = useState(false);
   const [isLoading, setIsLoading] = useState(true); // Loading for initial fetch
   const [isSubmitting, setIsSubmitting] = useState(false); // Loading for form submission

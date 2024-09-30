@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import TldrSection from "./tldr";
 import CompareSection from "./compare";
@@ -8,8 +7,6 @@ import OutfitSection from "./getOutfit";
 import { Suspense } from "react";
 
 export default function Forecast() {
-  const searchParams = useSearchParams();
-  const city = searchParams.get("city");
 
   return (
     <div className="snap-y snap-mandatory h-screen overflow-y-scroll">
@@ -27,9 +24,9 @@ export default function Forecast() {
 
       {/* Wrap your sections in Suspense */}
       <Suspense fallback={<div>Loading...</div>}>
-        <TldrSection city={city || ''} />
-        <OutfitSection city={city || ''} />
-        <CompareSection city={city || ''} />
+        <TldrSection />
+        <OutfitSection />
+        <CompareSection />
       </Suspense>
     </div>
   );

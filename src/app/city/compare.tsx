@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function TrendComparison({ city }: { city: string }) {
+export default function TrendComparison() {
+  const searchParams = useSearchParams();
+  const city = searchParams.get("city");
+
   const [hasFetched, setHasFetched] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [comparison, setComparison] = useState<string>(""); // Single string for trends comparison

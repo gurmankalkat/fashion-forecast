@@ -2,8 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import Image from 'next/image';
+import { useSearchParams } from "next/navigation";
 
-export default function TldrSection({ city }: { city: string }) {
+export default function TldrSection() {
+  const searchParams = useSearchParams();
+  const city = searchParams.get("city");
+
   const tldrRef = useRef(null);
   const [hasFetched, setHasFetched] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
