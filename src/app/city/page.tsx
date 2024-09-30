@@ -16,7 +16,7 @@ export default function Forecast() {
       {/* Intro */}
       <section className="snap-start h-screen flex items-center justify-center bg-customWhite">
         <motion.h1
-          className="text-2xl text-center"
+          className="text-4xl text-center p-28"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 2 }}

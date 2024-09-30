@@ -13,22 +13,31 @@ export default function OutfitGenerator({ city }: { city: string }) {
 
   const sectionRef = useRef<HTMLDivElement | null>(null);
 
-  // Simple fetch function to get comparison data
+  const retryFetch = async (url: string | URL | Request, options = {}, retries = 3, delay = 1000) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, options);
+        if (response.ok) {
+          return await response.json();
+        } else {
+          console.error(`Attempt ${i + 1} failed: ${response.statusText}`);
+        }
+      } catch (error) {
+        console.error(`Attempt ${i + 1} failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+      await new Promise(res => setTimeout(res, delay * (i + 1))); // Exponential backoff
+    }
+    throw new Error('Failed to fetch after multiple retries');
+  };
+  
   const fetchData = async (url: string) => {
     try {
-      const response = await fetch(url);
-      
-      if (response.ok) {
-        return await response.json();
-      } else {
-        console.error(`Error: ${response.status} - ${response.statusText}`);
-        throw new Error(`Failed to fetch: ${response.status} - ${response.statusText}`);
-      }
+      return await retryFetch(url, {}, 3, 1000); // 3 retries, 1 second delay between retries
     } catch (error) {
-      console.error('API call failed:', error);
+      console.error('API call failed after retries:', error);
       throw new Error('Failed to fetch data from API');
     }
-  };
+  };  
 
   useEffect(() => {
     const observer = new IntersectionObserver(

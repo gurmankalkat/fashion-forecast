@@ -52,6 +52,8 @@ export async function GET(req: NextRequest) {
     const queryType = searchParams.get('type');
     const query = searchParams.get('query');
     const city = searchParams.get('city');
+    console.log("Query type: ", queryType);
+    console.log("City: ", city);
 
     if (!query || !queryType) {
       return NextResponse.json({ error: 'Query and type are required.' }, { status: 400 });
@@ -75,7 +77,7 @@ export async function GET(req: NextRequest) {
 
     // Define prompts for different query types
     if (queryType === 'tldr') {
-      systemPrompt = `You are a fashion stylist focusing on fashion trends. Summarize the top fashion trends in ${city} from the given search results in a 4-sentence paragraph. Each sentence must have a maximum of 20 words. Ignore info about cities that are not ${city}. Do not use bullet points or numbers to split sentences.`;
+      systemPrompt = `You are a fashion stylist focusing on fashion trends. Summarize the top fashion trends in ${city} from the given search results in a 4 sentence paragraph. Each sentence should have a maximum of 20 words. Ignore info about cities that are not ${city}. Do not use bullet points or numbers to split sentences.`;
       userMessage = "Please provide a brief summary of the top fashion trends.";
     } else if (queryType === 'compare') {
       systemPrompt = `You are a fashion researcher. Compare current fashion trends with historical fashion trends in ${city}. Provide a concise paragraph explaining the differences and similarities.`;
