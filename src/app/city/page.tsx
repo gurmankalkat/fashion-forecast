@@ -1,11 +1,11 @@
-// Forecast.tsx
 "use client";
 
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import TldrSection from "./tldr"; 
-import CompareSection from "./compare"; 
+import TldrSection from "./tldr";
+import CompareSection from "./compare";
 import OutfitSection from "./getOutfit";
+import { Suspense } from "react";
 
 export default function Forecast() {
   const searchParams = useSearchParams();
@@ -24,9 +24,13 @@ export default function Forecast() {
           Discover fashion inspiration from emerging trends, using insights from runway shows, seasonal changes, and consumer preferences.
         </motion.h1>
       </section>
-      <TldrSection city={city || ''} /> 
-      <OutfitSection city={city || ''} /> 
-      <CompareSection city={city || ''} /> 
+
+      {/* Wrap your sections in Suspense */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <TldrSection city={city || ''} />
+        <OutfitSection city={city || ''} />
+        <CompareSection city={city || ''} />
+      </Suspense>
     </div>
   );
 }
