@@ -4,7 +4,8 @@
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import TldrSection from "./tldr"; 
-import HistoricalData from "./compare"; 
+import CompareSection from "./compare"; 
+import OutfitSection from "./getOutfit";
 
 export default function Forecast() {
   const searchParams = useSearchParams();
@@ -23,8 +24,9 @@ export default function Forecast() {
           Discover fashion inspiration from emerging trends, using insights from runway shows, seasonal changes, and consumer preferences.
         </motion.h1>
       </section>
-      <TldrSection city={city || ''} /> 
-      <HistoricalData city={city || ''} /> 
+      {/* <TldrSection city={city || ''} />  */}
+      {/* <CompareSection city={city || ''} />  */}
+      <OutfitSection city={city || ''} /> 
     </div>
   );
 }

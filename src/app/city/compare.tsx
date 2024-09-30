@@ -35,8 +35,6 @@ export default function TrendComparison({ city }: { city: string }) {
             const query = `This is the biggest difference in fashion in ${city} today versus 5 years ago:`;
             const data = await fetchData(`/api/perform-rag?type=compare&query=${encodeURIComponent(query)}&city=${encodeURIComponent(city)}`);
 
-            // console.log("Comparison data: ", data);
-
             // Set comparison result
             setComparison(data.summary || "Unable to generate comparison.");
 
