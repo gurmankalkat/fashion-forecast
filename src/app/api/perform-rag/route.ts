@@ -21,10 +21,11 @@ interface ExaResult {
 }
 
 // Retry helper function
-async function retryWithBackoff(fn: () => Promise<any>, retries = 3, delay = 1000): Promise<any> {
+async function retryWithBackoff<T>(fn: () => Promise<T>, retries = 3, delay = 1000): Promise<T> {
   try {
     return await fn();
   } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     if (retries > 0) {
       console.warn(`Retrying... (${retries} retries left)`);
       await new Promise(res => setTimeout(res, delay)); // Wait before retrying
