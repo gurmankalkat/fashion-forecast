@@ -20,18 +20,33 @@ interface ExaResult {
   results: { text: string }[];
 }
 
-// Helper function for image generation
+// Retry helper function
+async function retryWithBackoff(fn: () => Promise<any>, retries = 3, delay = 1000): Promise<any> {
+  try {
+    return await fn();
+  } catch (error) {
+    if (retries > 0) {
+      console.warn(`Retrying... (${retries} retries left)`);
+      await new Promise(res => setTimeout(res, delay)); // Wait before retrying
+      return retryWithBackoff(fn, retries - 1, delay * 2); // Exponential backoff
+    } else {
+      throw new Error('Max retries reached');
+    }
+  }
+}
+
+// Helper function for image generation with retry logic
 async function generateImage(prompt: string, numImages: number, imageSize: string = '512x512'): Promise<string[]> {
   let imageUrls: string[] = [];
   try {
     if (prompt.length > 1000) {
       prompt = prompt.slice(0, 980) + "...";
     }
-    const dalleResponse = await openai.images.generate({
+    const dalleResponse = await retryWithBackoff(() => openai.images.generate({
       prompt: prompt,
       n: numImages,
       size: imageSize as "256x256" | "512x512" | "1024x1024" | "1792x1024" | "1024x1792",
-    });
+    }));
     imageUrls = dalleResponse.data.map((img: { url?: string }) => img.url ?? '');
   } catch (error) {
     console.error('DALL·E Image Generation Error:', error);
@@ -40,15 +55,31 @@ async function generateImage(prompt: string, numImages: number, imageSize: strin
   return imageUrls;
 }
 
-// Helper function to generate GPT-3.5 completion
+// Helper function to generate GPT-3.5 completion with error handling
 async function generateCompletion(systemPrompt: string, userMessage: string, exaResult: ExaResult) {
-  return openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Search results: ${JSON.stringify(exaResult.results.map((r: { text: string }) => r.text))}\n\n${userMessage}` }
-    ]
-  });
+  try {
+    const response = await retryWithBackoff(() => openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Search results: ${JSON.stringify(exaResult.results.map((r: { text: string }) => r.text))}\n\n${userMessage}` }
+      ]
+    }));
+
+    // Check if response is in JSON format
+    if (response && response.choices?.[0]?.message?.content) {
+      return response;
+    } else {
+      throw new Error("Received an invalid response from OpenAI (non-JSON).");
+    }
+  } catch (error) {
+    console.error('Error from OpenAI:', error);
+    if (error instanceof Error) {
+      throw new Error("Failed to generate completion: " + error.message);
+    } else {
+      throw new Error("Failed to generate completion: An unknown error occurred");
+    }
+  }
 }
 
 export async function GET(req: NextRequest) {
@@ -75,7 +106,8 @@ export async function GET(req: NextRequest) {
       exaFilters.startPublishedDate = getSixMonthsAgoDate();
     }
 
-    const exaResult: ExaResult = await exa.searchAndContents(query, exaFilters);
+    // Exa search with retry logic
+    const exaResult: ExaResult = await retryWithBackoff(() => exa.searchAndContents(query, exaFilters));
 
     let systemPrompt = "";
     let userMessage = "";
@@ -117,6 +149,7 @@ export async function GET(req: NextRequest) {
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
+      console.error('Server error:', error);
       return NextResponse.json({ error: 'Failed to perform operation', details: error.message }, { status: 500 });
     }
     return NextResponse.json({ error: 'Failed to perform operation' }, { status: 500 });
