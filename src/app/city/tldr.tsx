@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from 'next/image';
 
 export default function TldrSection({ city }: { city: string }) {
   const tldrRef = useRef(null);
@@ -107,10 +108,13 @@ export default function TldrSection({ city }: { city: string }) {
             {imageUrls[currentIndex] === "Unable to generate images" || !imageUrls[currentIndex] ? (
               <h4 className="text-2xl text-center p-10 font-roboto">Unable to generate images. This is either because we are only able to generate 5 images/min or there was a violation of OpenAI's safety system, as all fashion trends do not comply. Try again with another city. Sorry!</h4>
             ) : (
-              <img
-                src={imageUrls[currentIndex]}
-                alt={`AI Visual ${currentIndex + 1}`}
-                className="h-full w-full object-cover"
+              <Image
+                src={imageUrls[currentIndex]} 
+                alt={`AI Visual ${currentIndex + 1}`} 
+                className="object-cover"
+                width={500} // Add the appropriate width (adjust as needed)
+                height={500} // Add the appropriate height (adjust as needed)
+                layout="responsive" // This helps maintain the aspect ratio with dynamic size
               />
             )}
           </div>

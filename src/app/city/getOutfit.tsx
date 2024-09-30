@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from 'next/image';
 
 export default function OutfitGenerator({ city }: { city: string }) {
   const [hasFetched, setHasFetched] = useState(false);
@@ -184,7 +185,14 @@ export default function OutfitGenerator({ city }: { city: string }) {
                     )}
                     {imageUrl && (
                       <div className="flex flex-col items-center">
-                        <img src={imageUrl} alt="Generated Outfit" className="rounded-md shadow-md" />
+                        <Image 
+                          src={imageUrl} 
+                          alt="Generated Outfit" 
+                          className="rounded-md shadow-md"
+                          width={500} // Add the appropriate width
+                          height={500} // Add the appropriate height
+                          objectFit="cover" // Optional: Specify how the image should be resized
+                        />
                       </div>
                     )}
                   </>
