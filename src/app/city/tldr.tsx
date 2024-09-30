@@ -106,7 +106,9 @@ export default function TldrSection({ city }: { city: string }) {
 
           <div className="h-full w-full flex items-center justify-center bg-customWhite">
             {imageUrls[currentIndex] === "Unable to generate images" || !imageUrls[currentIndex] ? (
-              <h4 className="text-2xl text-center p-10 font-roboto">Unable to generate images. This is either because we are only able to generate 5 images/min or there was a violation of OpenAI's safety system, as all fashion trends do not comply. Try again with another city. Sorry!</h4>
+              <h4 className="text-2xl text-center p-10 font-roboto">
+                Unable to generate images. This is either because we are only able to generate 5 images/min or there was a violation of OpenAI&apos;s safety system, as all fashion trends do not comply. Try again with another city. Sorry!
+              </h4>            
             ) : (
               <Image
                 src={imageUrls[currentIndex]} 

@@ -15,6 +15,11 @@ function getSixMonthsAgoDate(): string {
   return currentDate.toISOString().split('T')[0];
 }
 
+// Type for Exa search result
+interface ExaResult {
+  results: { text: string }[];
+}
+
 // Helper function for image generation
 async function generateImage(prompt: string, numImages: number, imageSize: string = '512x512'): Promise<string[]> {
   let imageUrls: string[] = [];
@@ -27,7 +32,7 @@ async function generateImage(prompt: string, numImages: number, imageSize: strin
       n: numImages,
       size: imageSize as "256x256" | "512x512" | "1024x1024" | "1792x1024" | "1024x1792",
     });
-    imageUrls = dalleResponse.data.map((img) => img.url ?? '');
+    imageUrls = dalleResponse.data.map((img: { url?: string }) => img.url ?? '');
   } catch (error) {
     console.error('DALL·E Image Generation Error:', error);
     imageUrls = ["Unable to generate images"];
@@ -36,12 +41,12 @@ async function generateImage(prompt: string, numImages: number, imageSize: strin
 }
 
 // Helper function to generate GPT-3.5 completion
-async function generateCompletion(systemPrompt: string, userMessage: string, exaResult: any) {
+async function generateCompletion(systemPrompt: string, userMessage: string, exaResult: ExaResult) {
   return openai.chat.completions.create({
     model: 'gpt-3.5-turbo',
     messages: [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Search results: ${JSON.stringify(exaResult.results.map((r: { text: any; }) => r.text))}\n\n${userMessage}` }
+      { role: 'user', content: `Search results: ${JSON.stringify(exaResult.results.map((r: { text: string }) => r.text))}\n\n${userMessage}` }
     ]
   });
 }
@@ -59,7 +64,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Query and type are required.' }, { status: 400 });
     }
 
-    const exaFilters: Record<string, any> = {
+    const exaFilters: Record<string, unknown> = {
       type: 'auto',
       useAutoprompt: true,
       numResults: 10,
@@ -70,7 +75,7 @@ export async function GET(req: NextRequest) {
       exaFilters.startPublishedDate = getSixMonthsAgoDate();
     }
 
-    const exaResult = await exa.searchAndContents(query, exaFilters);
+    const exaResult: ExaResult = await exa.searchAndContents(query, exaFilters);
 
     let systemPrompt = "";
     let userMessage = "";
@@ -110,7 +115,10 @@ export async function GET(req: NextRequest) {
     } else {
       return NextResponse.json({ error: 'Failed to generate response.' }, { status: 500 });
     }
-  } catch (error: any) {
-    return NextResponse.json({ error: 'Failed to perform operation', details: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json({ error: 'Failed to perform operation', details: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ error: 'Failed to perform operation' }, { status: 500 });
   }
 }

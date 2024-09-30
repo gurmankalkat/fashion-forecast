@@ -67,7 +67,7 @@ export default function TrendComparison({ city }: { city: string }) {
         </div>
       ) : (
         <div className="h-full flex flex-col items-center justify-center p-10 relative">
-          <h2 className="text-4xl text-center mb-4">Today's Looks vs. Yesterday's Iconic Trends</h2>
+          <h2 className="text-4xl text-center mb-4">Today&apos;s Looks vs. Yesterday&apos;s Iconic Trends</h2>
           <div className="text-2xl text-center font-roboto p-24">
             <p>{comparison}</p>
           </div>
