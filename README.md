@@ -1,4 +1,6 @@
-App: https://fashion-forecast.onrender.com/
+## Fashion Forecast Web App (Exa + OpenAI)
+- https://fashion-forecast.onrender.com/
+- [Watch it in action!](https://drive.google.com/file/d/12-FD9W9aiLKkJaSVUj_r4Da5TDIeeqQi/view?usp=sharing)
 
 Ignore deployments made with Vercel! Access the app through the link above!
 
