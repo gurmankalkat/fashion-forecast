@@ -29,9 +29,7 @@ export default function TldrSection() {
               console.log("data: ", data);
 
               if (data.summaries) {
-                const sentences = data.summaries.split(/[.!?]\s/).filter(Boolean).map((sentence: string) => {
-                  return sentence.trim().endsWith('.') ? sentence : sentence + '.';
-                });
+                const sentences = data.summaries.split(/[.!?]\s+/).filter(Boolean); 
                 setTldrResults(sentences);
               } else {
                 console.error('No TLDR result found in the response');

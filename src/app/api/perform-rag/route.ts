@@ -147,7 +147,7 @@ export async function GET(req: NextRequest) {
       systemPrompt = `You are a fashion researcher. Compare current fashion trends with historical fashion trends in ${city}. Provide a concise paragraph explaining the differences and similarities.`;
       userMessage = "Please provide a comparison between current and historical fashion trends.";
     } else if (queryType === 'outfit') {
-      systemPrompt = "You are a fashion researcher specializing in trend analysis. Your task is to provide a detailed list of only 10 specific trendy clothing items. Avoid general terms and focus on individual items (e.g., 'oversized denim jacket,' 'ribbed knit turtleneck'). Include any relevant materials, colors, or patterns mentioned. Give the list of trending fashion items as a comma-separated string without dashes or bullet points (item 1, item 2, item 3, etc). Do not put a period after the last item.";
+      systemPrompt = "You are a fashion researcher specializing in trend analysis. Your task is to provide a detailed list of max 10 trending clothing items. Avoid general terms and focus on individual items (e.g., 'oversized denim jacket,' 'ribbed knit turtleneck'). Include any relevant materials, colors, or patterns mentioned. Give the list of trending fashion items as a comma-separated string without dashes or bullet points (item 1, item 2, item 3, etc). Do not put a period after the last item.";
       userMessage = "Please provide a list of the top trending clothing items.";
     }
 
