@@ -28,8 +28,8 @@ export default function TldrSection() {
               const data = await response.json();
               console.log("data: ", data);
 
-              if (data.summary) {
-                const sentences = data.summary.split(/[.!?]\s/).filter(Boolean).map((sentence: string) => {
+              if (data.summaries) {
+                const sentences = data.summaries.split(/[.!?]\s/).filter(Boolean).map((sentence: string) => {
                   return sentence.trim().endsWith('.') ? sentence : sentence + '.';
                 });
                 setTldrResults(sentences);
